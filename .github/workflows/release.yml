@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create ZIP
+        run: |
+          zip -r kick-bypass-geo-category-block-${{ steps.version.outputs.VERSION }}.zip \
+            manifest.json inject.js icons/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ steps.version.outputs.VERSION }}
+          body: |
+            ## Kick Bypass Geo-Category Block v${{ steps.version.outputs.VERSION }}
+
+            ### 🛠️ Kurulum (Installation)
+
+            🇹🇷 **Türkçe**:
+            1. Aşağıdaki `Assets` bölümünden `.zip` dosyasını bilgisayarınıza indirin.
+            2. İndirdiğiniz ZIP dosyasını bir klasöre çıkartın.
+            3. Tarayıcınızda `chrome://extensions` (Uzantılar) sayfasını açın.
+            4. Sağ üst köşeden **Geliştirici modunu (Developer mode)** aktif edin.
+            5. Sol üstte beliren **Paketlenmemiş öğe yükle (Load unpacked)** butonuna tıklayıp projeyi çıkarttığınız (içinde `manifest.json` olan) klasörü seçin.
+
+            🌍 **English**:
+            1. Download the `.zip` file from the assets below.
+            2. Extract/unzip it to a local folder.
+            3. Go to `chrome://extensions` in your browser.
+            4. Enable **Developer mode** (top right).
+            5. Click **Load unpacked** and select the extracted folder.
+          files: |
+            kick-bypass-geo-category-block-${{ steps.version.outputs.VERSION }}.zip
